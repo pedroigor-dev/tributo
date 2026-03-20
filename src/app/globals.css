@@ -150,3 +150,28 @@
 .lyric-appear {
   animation: lyric-appear 0.65s ease forwards;
 }
+
+/* Flower burst — 3D parabolic toss */
+@keyframes petal-fly {
+  0% {
+    opacity: 1;
+    transform:
+      perspective(600px)
+      translate(0, 0)
+      rotateX(0deg)
+      rotateZ(var(--rotate-start))
+      scale(1);
+  }
+  60% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform:
+      perspective(600px)
+      translate(var(--dx), calc(var(--dy) + 30vh))
+      rotateX(var(--rotate-x))
+      rotateZ(var(--rotate-end))
+      scale(0.5);
+  }
+}

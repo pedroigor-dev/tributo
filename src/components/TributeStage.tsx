@@ -6,6 +6,7 @@ import { useCurtainReveal, CURTAIN_CLOSE_MS } from "@/hooks/useCurtainReveal";
 import { useLyrics } from "@/hooks/useLyrics";
 import { CurtainPanel } from "./CurtainPanel";
 import { PlayButton } from "./PlayButton";
+import { FlowerBurst } from "./FlowerBurst";
 
 const OUTRO_TIME = 214.0;
 const OUTRO_CLOSE_DELAY_MS = 3800;
@@ -161,6 +162,8 @@ export function TributeStage() {
 
       <CurtainPanel side="left" isOpen={isOpen} isClosing={isClosing} />
       <CurtainPanel side="right" isOpen={isOpen} isClosing={isClosing} />
+
+      <FlowerBurst />
 
       <div
         className={[
