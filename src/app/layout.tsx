@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${playfair.variable} antialiased`}>
-      <body className="bg-black overflow-hidden">{children}</body>
+      <body className="bg-black overflow-hidden" suppressHydrationWarning>{children}</body>
     </html>
   );
 }

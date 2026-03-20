@@ -24,12 +24,12 @@ export function PlayButton({ onClick }: PlayButtonProps) {
         <span className="absolute inset-3 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors duration-700" />
 
         <svg
-          className="relative w-9 h-9 text-white/70 translate-x-1 group-hover:text-white transition-colors duration-500"
+          className="relative w-8 h-8 text-white/70 group-hover:text-white transition-colors duration-500"
           fill="currentColor"
           viewBox="0 0 24 24"
           aria-hidden="true"
         >
-          <path d="M8 5v14l11-7z" />
+          <path d="M9 6.5v11l9-5.5z" />
         </svg>
       </button>
 
