@@ -22,22 +22,23 @@ interface Petal {
 let nextId = 0;
 
 function spawnPetals(originX: number, originY: number): Petal[] {
-  const count = 10 + Math.floor(Math.random() * 6); 
+  const count = 10 + Math.floor(Math.random() * 6);
   return Array.from({ length: count }, () => {
-    const angle = Math.random() * 2 * Math.PI;
-    const speed = 18 + Math.random() * 26; 
+    // Spread angle: mostly upward (between 200° and 340° in CSS coords where 270° = straight up)
+    const angle = ((200 + Math.random() * 140) * Math.PI) / 180;
+    const speed = 22 + Math.random() * 32;
     return {
       id: nextId++,
       x: (originX / window.innerWidth) * 100,
       y: (originY / window.innerHeight) * 100,
-      dx: Math.cos(angle) * speed,
-      dy: -(Math.abs(Math.sin(angle)) * speed * 0.8 + 8),
+      dx: Math.cos(angle) * speed * 0.55,   // horizontal spread (vw)
+      dy: Math.sin(angle) * speed * 0.75,   // negative = up in CSS
       rotate: Math.random() * 360,
-      rotateEnd: (Math.random() - 0.5) * 720,
-      rotateX: (Math.random() - 0.5) * 180,
-      scale: 0.7 + Math.random() * 0.9,
-      duration: 1200 + Math.random() * 800,
-      delay: Math.random() * 150,
+      rotateEnd: (Math.random() - 0.5) * 900,
+      rotateX: (Math.random() - 0.5) * 220,
+      scale: 0.8 + Math.random() * 1.1,
+      duration: 1400 + Math.random() * 900,
+      delay: Math.random() * 180,
       emoji: FLOWERS[Math.floor(Math.random() * FLOWERS.length)],
     };
   });
@@ -83,25 +84,35 @@ export function FlowerBurst() {
         </div>
       ))}
 
-      <button
-        ref={buttonRef}
-        onClick={handleClick}
-        aria-label="Jogar flores"
-        className="
-          fixed bottom-6 right-6 z-40
-          text-2xl
-          rounded-full w-12 h-12
-          flex items-center justify-center
-          border border-white/15 bg-white/5
-          hover:bg-white/12 hover:border-white/35
-          hover:scale-110 active:scale-95
-          transition-all duration-300 ease-out
-          backdrop-blur-sm cursor-pointer
-          shadow-[0_0_20px_rgba(255,255,255,0.04)]
-        "
-      >
-        🌸
-      </button>
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-2">
+        {/* Tooltip */}
+        <p className="
+          text-white/35 text-[10px] tracking-[0.22em] uppercase font-light
+          text-right leading-relaxed select-none
+          transition-opacity duration-500
+        ">
+          dedique flores<br />à minha vózinha
+        </p>
+
+        <button
+          ref={buttonRef}
+          onClick={handleClick}
+          aria-label="Jogar flores"
+          className="
+            text-2xl
+            rounded-full w-12 h-12
+            flex items-center justify-center
+            border border-white/15 bg-white/5
+            hover:bg-white/12 hover:border-white/35
+            hover:scale-110 active:scale-95
+            transition-all duration-300 ease-out
+            backdrop-blur-sm cursor-pointer
+            shadow-[0_0_20px_rgba(255,255,255,0.04)]
+          "
+        >
+          🌸
+        </button>
+      </div>
     </>
   );
 }

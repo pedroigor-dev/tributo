@@ -154,24 +154,33 @@
 /* Flower burst — 3D parabolic toss */
 @keyframes petal-fly {
   0% {
-    opacity: 1;
+    opacity: 0;
     transform:
-      perspective(600px)
+      perspective(700px)
       translate(0, 0)
       rotateX(0deg)
       rotateZ(var(--rotate-start))
-      scale(1);
+      scale(0.6);
   }
-  60% {
-    opacity: 0.9;
+  8% {
+    opacity: 1;
+    transform:
+      perspective(700px)
+      translate(calc(var(--dx) * 0.08), calc(var(--dy) * 0.08))
+      rotateX(calc(var(--rotate-x) * 0.1))
+      rotateZ(calc(var(--rotate-start) + var(--rotate-end) * 0.05))
+      scale(1.1);
+  }
+  70% {
+    opacity: 0.85;
   }
   100% {
     opacity: 0;
     transform:
-      perspective(600px)
-      translate(var(--dx), calc(var(--dy) + 30vh))
+      perspective(700px)
+      translate(var(--dx), var(--dy))
       rotateX(var(--rotate-x))
       rotateZ(var(--rotate-end))
-      scale(0.5);
+      scale(0.35);
   }
 }
