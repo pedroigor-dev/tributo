@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { useCurtainReveal, CURTAIN_CLOSE_MS } from "@/hooks/useCurtainReveal";
 import { useLyrics } from "@/hooks/useLyrics";
 import { CurtainPanel } from "./CurtainPanel";
@@ -9,29 +9,35 @@ import { PlayButton } from "./PlayButton";
 import { FlowerBurst } from "./FlowerBurst";
 
 const OUTRO_TIME = 214.0;
-const OUTRO_CLOSE_DELAY_MS = 3800;
+const OUTRO_VIDEO_DELAY_MS = 3800;
 
 export function TributeStage() {
   const { state, trigger, close } = useCurtainReveal();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [audioTime, setAudioTime] = useState(0);
   const [outroStarted, setOutroStarted] = useState(false);
+  const [videoVisible, setVideoVisible] = useState(false);
   const currentLyric = useLyrics(audioTime);
 
   const closeRef = useRef(close);
   closeRef.current = close;
-
   const outroTriggeredRef = useRef(false);
 
-  const isOpen = state === "opening" || state === "revealed";
+  const isOpen    = state === "opening" || state === "revealed";
   const isClosing = state === "closing";
   const isRevealed = state === "revealed" || state === "closing";
-  const isOutro = state === "revealed" && audioTime >= OUTRO_TIME;
+  const isOutro    = state === "revealed" && audioTime >= OUTRO_TIME;
 
   useEffect(() => {
     if (state === "idle") {
       outroTriggeredRef.current = false;
       setOutroStarted(false);
+      setVideoVisible(false);
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
     }
   }, [state]);
 
@@ -42,25 +48,30 @@ export function TributeStage() {
   }, [state]);
 
   useEffect(() => {
+    if (videoVisible) {
+      videoRef.current?.play().catch(() => {});
+    }
+  }, [videoVisible]);
+
+  useEffect(() => {
     if (!isOutro || outroTriggeredRef.current) return;
     outroTriggeredRef.current = true;
     setOutroStarted(true);
 
-    const closeTimer = setTimeout(() => closeRef.current(), OUTRO_CLOSE_DELAY_MS);
+    const videoTimer = setTimeout(() => setVideoVisible(true), OUTRO_VIDEO_DELAY_MS);
+    return () => clearTimeout(videoTimer);
+  }, [isOutro]);
 
-    const audioTimer = setTimeout(() => {
+  const handleVideoEnded = useCallback(() => {
+    closeRef.current();
+    setTimeout(() => {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
       setAudioTime(0);
-    }, OUTRO_CLOSE_DELAY_MS + CURTAIN_CLOSE_MS + 300);
-
-    return () => {
-      clearTimeout(closeTimer);
-      clearTimeout(audioTimer);
-    };
-  }, [isOutro]);
+    }, CURTAIN_CLOSE_MS + 300);
+  }, []);
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-black">
@@ -72,8 +83,13 @@ export function TributeStage() {
         onTimeUpdate={() => setAudioTime(audioRef.current?.currentTime ?? 0)}
       />
 
-      <div className="absolute inset-0 flex items-center justify-center">
-
+      <div
+        className={[
+          "absolute inset-0 flex items-center justify-center",
+          "transition-opacity duration-1500",
+          videoVisible ? "opacity-0 pointer-events-none" : "opacity-100",
+        ].join(" ")}
+      >
         <div className="flex-1 items-center justify-end pr-6 lg:pr-14 min-w-0 hidden md:flex">
           {isRevealed && !outroStarted && currentLyric?.side === "left" && (
             <div key={currentLyric.time} className="lyric-appear text-right max-w-47.5 lg:max-w-60">
@@ -85,7 +101,6 @@ export function TributeStage() {
         </div>
 
         <div className="flex flex-col items-center shrink-0">
-
           <div
             className={[
               "relative w-64 sm:w-70 aspect-3/4",
@@ -152,15 +167,27 @@ export function TributeStage() {
             </div>
           )}
         </div>
-
       </div>
+
+      <video
+        ref={videoRef}
+        src="/vozinha2.mp4"
+        preload="metadata"
+        playsInline
+        onEnded={handleVideoEnded}
+        className={[
+          "absolute inset-0 w-full h-full object-cover z-15",
+          "transition-opacity duration-1500",
+          videoVisible ? "opacity-100" : "opacity-0 pointer-events-none",
+        ].join(" ")}
+      />
 
       <div
         aria-hidden="true"
         className="absolute inset-0 z-10 pointer-events-none opacity-[0.035] grain-overlay"
       />
 
-      <CurtainPanel side="left" isOpen={isOpen} isClosing={isClosing} />
+      <CurtainPanel side="left"  isOpen={isOpen} isClosing={isClosing} />
       <CurtainPanel side="right" isOpen={isOpen} isClosing={isClosing} />
 
       <FlowerBurst />
