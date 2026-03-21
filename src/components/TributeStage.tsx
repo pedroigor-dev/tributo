@@ -18,6 +18,7 @@ export function TributeStage() {
   const [audioTime, setAudioTime] = useState(0);
   const [outroStarted, setOutroStarted] = useState(false);
   const [videoVisible, setVideoVisible] = useState(false);
+  const [showMemorial, setShowMemorial] = useState(false);
   const currentLyric = useLyrics(audioTime);
 
   const closeRef = useRef(close);
@@ -38,6 +39,9 @@ export function TributeStage() {
         videoRef.current.pause();
         videoRef.current.currentTime = 0;
       }
+    }
+    if (state === "closing" && outroTriggeredRef.current) {
+      setShowMemorial(true);
     }
   }, [state]);
 
@@ -176,7 +180,11 @@ export function TributeStage() {
         playsInline
         onEnded={handleVideoEnded}
         className={[
-          "absolute inset-0 w-full h-full object-cover z-15",
+          "absolute z-15 rounded-sm",
+          "w-[min(90vw,480px)] aspect-video",
+          "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+          "object-cover grayscale",
+          "shadow-[0_0_80px_rgba(0,0,0,0.9)]",
           "transition-opacity duration-1500",
           videoVisible ? "opacity-100" : "opacity-0 pointer-events-none",
         ].join(" ")}
@@ -192,16 +200,37 @@ export function TributeStage() {
 
       <FlowerBurst />
 
+
+      {state !== "idle" && (
+        <button
+          onClick={() => { if (audioRef.current) audioRef.current.currentTime = 213; }}
+          className="fixed bottom-6 left-6 z-50 text-white/60 hover:text-white text-[11px] tracking-widest uppercase transition-colors duration-300 cursor-pointer border border-white/20 hover:border-white/50 px-3 py-1.5 rounded"
+        >
+          skip
+        </button>
+      )}
+
       <div
         className={[
-          "absolute inset-0 z-30 flex items-center justify-center",
-          "transition-opacity duration-700",
-          state === "idle"
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none",
+          "absolute inset-0 z-30 flex flex-col items-center justify-center gap-10",
+          "transition-opacity duration-1000",
+          state === "idle" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         ].join(" ")}
       >
-        <PlayButton onClick={trigger} />
+        {showMemorial && (
+          <div className="text-center px-6 lyric-appear">
+            <p className="font-serif italic text-white/80 text-xl sm:text-2xl leading-relaxed">
+              Em mem&oacute;ria de Elizete Campos
+            </p>
+            <p className="mt-3 font-serif italic text-white/55 text-base sm:text-lg leading-relaxed">
+              te amo v&oacute;, seu neto te ama pra toda eternidade
+            </p>
+            <p className="mt-5 text-white/25 text-[11px] tracking-[0.4em] uppercase font-light">
+              07/06/1939 &mdash; 17/03/2026
+            </p>
+          </div>
+        )}
+        <PlayButton onClick={() => { setShowMemorial(false); trigger(); }} />
       </div>
 
     </div>
