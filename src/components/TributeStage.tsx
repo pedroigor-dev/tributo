@@ -141,6 +141,18 @@ export function TributeStage() {
                 </p>
               </div>
             )}
+
+            {isRevealed && !outroStarted && currentLyric && (
+              <div className="absolute bottom-0 inset-x-0 z-10 md:hidden">
+                <div className="bg-linear-to-t from-black/80 via-black/40 to-transparent pt-8 pb-4 px-4">
+                  <div key={currentLyric.time} className="lyric-appear text-center">
+                    <p className="font-serif italic text-white/80 text-sm leading-relaxed drop-shadow-[0_1px_12px_rgba(0,0,0,1)]">
+                      {currentLyric.text}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div
